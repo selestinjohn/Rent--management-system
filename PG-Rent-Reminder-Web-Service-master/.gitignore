@@ -1,0 +1,30 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+
+# Django
+db.sqlite3
+/staticfiles/
+/media/
+
+# Local redis / windows build
+Redis-x64-5.0.14.1/
+
+# Celery
+celerybeat-schedule*
+celerybeat-schedule.bak
+celerybeat-schedule.dat
+celerybeat-schedule.dir
+
+# VSCode / IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log

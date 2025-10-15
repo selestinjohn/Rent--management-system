@@ -1,8 +1,12 @@
-from django.db import models
+from django.db import models  # ✅ Import models
 
-
-# Create your models here.
 class Contact(models.Model):
-    mesasge=models.CharField(max_length=100)
-    number=models.CharField(max_length=100)
-    date=models.DateField()
+    name = models.CharField(max_length=100)           # Tenant name
+    phone_number = models.CharField(max_length=100)   # Tenant phone
+    message = models.CharField(max_length=255)        # Reminder message
+    due_date = models.DateField()
+    sms_sent =models.BooleanField(default=False) #new field                    # Rent due date
+
+    def __str__(self):
+        # This string shows up in dropdowns/relations in admin
+        return f"{self.name} - {self.phone_number} - {self.due_date}"

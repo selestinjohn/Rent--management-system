@@ -1,10 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PG FORM</title>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -57,38 +57,94 @@
         button:hover {
             background-color: #45a049;
         }
+
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            font-weight: bold;
+        }
+
+        /* Popup notification */
+        #popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 6px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
-    <h1>PG FORM</h1>
-    <form method='post' action="" >
+    <h1>RENT MANAGEMENT SYSTEM</h1>
+
+    <form 
+        id="tenantForm"
+        method="post" 
+        hx-post="{% url 'add_tenant' %}" 
+        hx-target="#response" 
+        hx-swap="innerHTML"
+    >
         {% csrf_token %}
         <table>
             <tr>
-                <td><label for="value1">Phone Number</label></td>
-                <td><input type="text" name="number" id="value1" placeholder="Enter your number" required></td>
+                <td><label for="value0">Name</label></td>
+                <td><input type="text" name="name" id="value0" placeholder="Enter tenant name" required></td>
             </tr>
-    
+
+            <tr>
+                <td><label for="value1">Phone Number</label></td>
+                <td><input type="text" name="number" id="value1" placeholder="Enter phone number" required></td>
+            </tr>
+
             <tr>
                 <td><label for="value2">Message</label></td>
-                <td><input type="text" name="message" id="value2" placeholder="Enter your message" required></td>
+                <td><input type="text" name="message" id="value2" placeholder="Enter your message (use {name}, {due_date})" required></td>
             </tr>
-    
+
             <tr>
-                <td><label for="value3">Date</label></td>
-                <td><input type="date" name="dates" id="value3" placeholder="Enter date" required></td>
+                <td><label for="value3">Due Date</label></td>
+                <td><input type="date" name="dates" id="value3" required></td>
             </tr>
-    
+
             <tr>
-                <td colspan="2"><button type='submit'>Send</button></td>
+                <td colspan="2"><button type="submit">Save Tenant</button></td>
             </tr>
         </table>
     </form>
-    
-    <a href="/ser">ALL DATA</a>
 
-    <a href="/sms">SMS ALERT</a>
+    <!-- Response div for HTMX -->
+    <div id="response"></div>
 
+    <!-- Popup notification -->
+    <div id="popup">Tenant saved successfully!</div>
+
+    <br>
+    <a href="/ser">ALL DATA</a> |
+    <a href="/sms">SMS ALERT</a> |
     <a href="/all">ALL SMS ALERT</a>
+
+    <script>
+        // Listen for HTMX response
+        document.body.addEventListener("htmx:afterRequest", function(evt) {
+            if (evt.detail.xhr.status === 200) {
+                // Reset the form
+                document.getElementById("tenantForm").reset();
+
+                // Show popup
+                let popup = document.getElementById("popup");
+                popup.style.display = "block";
+
+                // Hide after 3 seconds
+                setTimeout(() => {
+                    popup.style.display = "none";
+                }, 3000);
+            }
+        });
+    </script>
 </body>
 </html>

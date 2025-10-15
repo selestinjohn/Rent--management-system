@@ -1,104 +1,35 @@
-from django.shortcuts import render,HttpResponse
-from sms.models import Contact
-from datetime import date , datetime, timedelta
-from twilio.rest import Client
-
-# harsh
-# 1234
+from django.shortcuts import render, HttpResponse
+from .models import Contact
+from .utils import send_sms
 
 def index(request):
-  if request.method == "POST":
-     number = request.POST.get("number")
-     message = request.POST.get("message")
-     dates= request.POST.get("dates")
-     contact= Contact(number=number,mesasge=message,date=dates)
-     contact.save()
-     
-     return render(request, 'index.html')
-  return render(request, 'index.html')
-
+    return render(request, 'index.html')
 
 def service(request):
-    
-    Data = Contact.objects.all()
-   #  for a in Data:
-   #     print(a.number)
-    pgdata={
-       'data':Data
-            }
+    contacts = Contact.objects.all()
+    return render(request, 'service.html', {'data': contacts})
 
-    return render(request, 'service.html', pgdata)
-
-
-
-
-def sms(request):
-    # to split date
-    today = date.today()
-    
-    # to filter datebase for only today date
-    filtered_data = Contact.objects.filter(date=today)
-    
-    n = []
-    m = []
-
-    for i in filtered_data:
-        n.append(i.number)
-        m.append(i.mesasge)
-    
-    for i, j in zip(n, m):
-        account_sid = 'Enter your account_sid'
-        auth_token = 'Enter your auth_token'
-        twilio_phone_number = 'Enter twilio number'
-        client = Client(account_sid, auth_token)
-        message = client.messages.create(
-            body=j,
-            from_=twilio_phone_number,
-            to='+91' + i  )
-        n=[]
-        m=[]
-        
-
-    return render(request, 'sms.html')
-
-
-def all_alert(request):
-
+def add_tenant(request):
     if request.method == "POST":
-        message = request.POST.get("message")
-    Data = Contact.objects.all()
-    n=[]
-    for a in Data:
-       n.append(a.number)
-    # print(n)
-    # print(message)
-    for i in n:
-        account_sid = 'Enter your account_sid'
-        auth_token = 'Enter your auth_token'
-        twilio_phone_number = 'Enter twilio number'
-        client = Client(account_sid, auth_token)
-        message = client.messages.create(
-            body=message,
-            from_=twilio_phone_number,
-            to='+91' + i  )
-        
-    return render(request, 'all.html')
-    
+        name = request.POST.get("name")
+        phone = request.POST.get("number")
+        message_text = request.POST.get("message")
+        due_date = request.POST.get("dates")
 
+        if not name or not phone or not message_text or not due_date:
+            return HttpResponse("<p style='color:red;'>❌ Missing required fields</p>")
 
+        contact = Contact.objects.create(
+            name=name,
+            phone_number=phone,
+            message=message_text,
+            due_date=due_date
+        )
 
+        # Send SMS immediately if you want
+        sms_text = message_text.format(name=name, due_date=due_date)
+        send_sms(phone, sms_text)
 
-   
+        return HttpResponse(f"<p style='color:green;'>✅ Tenant {name} added & SMS sent!</p>")
 
-            
-
-           
-
-               
-
-   
-    
-     
-     
-       
-   
+    return HttpResponse("<p style='color:red;'>❌ Invalid request method</p>")
