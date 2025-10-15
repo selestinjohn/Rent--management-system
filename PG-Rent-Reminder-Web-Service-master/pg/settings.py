@@ -3,6 +3,8 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import dj_database_url
+from celery.schedules import crontab
 
 # Load .env if you want to use environment variables
 load_dotenv()
@@ -12,9 +14,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY
 
+#SECRET_KEY = os.getenv("SECRET_KEY")
+#DEBUG = False
+#ALLOWED_HOSTS = ['your-app-name.onrender.com']
+
+# Security
+# =========================
 SECRET_KEY = os.getenv("SECRET_KEY")
-DEBUG = False
-ALLOWED_HOSTS = ['your-app-name.onrender.com']
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+
+
+
 
 # Installed apps
 INSTALLED_APPS = [
@@ -63,14 +75,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'pg.wsgi.application'
 
 
+
 # Database
-import dj_database_url
+# =========================
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+    "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+        conn_max_age=600,
+        ssl_require=False,
     )
 }
-
 
 
 
@@ -86,7 +100,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.getenv("TIME_ZONE", "Africa/Dar_es_Salaam")
 USE_I18N = True
 USE_TZ = True
 
