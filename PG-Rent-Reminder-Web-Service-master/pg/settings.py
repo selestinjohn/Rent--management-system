@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import os
+os.environ['TZ'] = 'Africa/Dar_es_Salaam'
 from dotenv import load_dotenv
 import dj_database_url
 from celery.schedules import crontab
