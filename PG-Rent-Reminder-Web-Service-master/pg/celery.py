@@ -17,7 +17,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'check-due-dates-every-minute': {
         'task': 'sms.tasks.check_due_dates_and_send_sms',
-        'schedule': crontab(minute='*/1'),  # every 1 minute
+        'schedule': crontab(minute='*'),  # every 1 minute
     },
 }
 

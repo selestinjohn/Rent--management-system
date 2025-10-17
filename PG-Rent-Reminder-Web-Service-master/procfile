@@ -1,1 +1,3 @@
 web: gunicorn pg.wsgi
+worker: celery -A pg worker --loglevel=info
+beat: celery -A pg beat --loglevel=info
